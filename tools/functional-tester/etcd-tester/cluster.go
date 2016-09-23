@@ -50,10 +50,10 @@ type cluster struct {
 
 	Size      int
 	Stressers []Stresser
+	Members   []*member
 
-	Members []*member
-
-	stressBuilder stressBuilder
+	stressBuilder        stressBuilder
+	leaseStresserBuilder leaseStresserBuilder
 }
 
 type ClusterStatus struct {
@@ -103,10 +103,16 @@ func (c *cluster) bootstrap() error {
 		}
 	}
 
-	c.Stressers = make([]Stresser, len(members))
-	for i, m := range members {
-		c.Stressers[i] = c.stressBuilder(m)
-		go c.Stressers[i].Stress()
+	c.Stressers = make([]Stresser, 0)
+
+	for _, m := range members {
+		c.Stressers = append(c.Stressers, c.stressBuilder(m), c.leaseStresserBuilder(m))
+	}
+
+	for idx := range c.Stressers {
+		go func(i int) {
+			c.Stressers[i].Stress()
+		}(idx)
 	}
 
 	c.Size = size
@@ -174,6 +180,7 @@ func (c *cluster) Cleanup() error {
 	for _, s := range c.Stressers {
 		s.Cancel()
 	}
+
 	return lasterr
 }
 

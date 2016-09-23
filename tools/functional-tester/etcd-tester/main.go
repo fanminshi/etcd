@@ -57,6 +57,7 @@ func main() {
 	pports := portsFromArg(*peerPorts, len(eps), defaultPeerPort)
 	fports := portsFromArg(*failpointPorts, len(eps), defaultFailpointPort)
 	agents := make([]agentConfig, len(eps))
+
 	for i := range eps {
 		agents[i].endpoint = eps[i]
 		agents[i].clientPort = cports[i]
@@ -73,10 +74,20 @@ func main() {
 		v2:             *isV2Only,
 	}
 
+	lsConfig := &leaseStressConfig{
+		numLeases:    10,
+		keysPerLease: 10,
+	}
+	// leaseStressers keep tracks of all the initialized leaseStressers. It is being used by leaseChecker for invariant check
+	var leaseStressers []Stresser
+	// pass f to the lease stresser builder; call f(ls) when building a new lease stresser
+	f := func(ls *leaseStresser) { leaseStressers = append(leaseStressers, ls) }
+
 	c := &cluster{
-		agents:        agents,
-		v2Only:        *isV2Only,
-		stressBuilder: newStressBuilder(*stresserType, sConfig),
+		agents:               agents,
+		v2Only:               *isV2Only,
+		stressBuilder:        newStressBuilder(*stresserType, sConfig),
+		leaseStresserBuilder: newLeaseStresserBuilder(lsConfig, f),
 	}
 
 	if err := c.bootstrap(); err != nil {
@@ -111,17 +122,25 @@ func main() {
 			schedule[i] = failures[caseNum]
 		}
 	}
-
 	t := &tester{
 		failures: schedule,
 		cluster:  c,
 		limit:    *limit,
-		checker:  newNoChecker(),
 	}
 
+	checkers := make([]Checker, 0)
+
 	if *consistencyCheck && !c.v2Only {
-		t.checker = newHashChecker(t)
+		checkers = append(checkers, newHashChecker(t))
+	} else {
+		checkers = append(checkers, newNoChecker())
 	}
+
+	lc := newLeaseChecker(leaseStressers)
+
+	checkers = append(checkers, lc)
+
+	t.checker = newCompositeChecker(checkers)
 
 	sh := statusHandler{status: &t.status}
 	http.Handle("/status", sh)
