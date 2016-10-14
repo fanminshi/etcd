@@ -115,12 +115,12 @@ func (ls *leaseStresser) run() {
 	defer ls.runWg.Done()
 	ls.restartKeepAlives()
 	for ls.ctx.Err() == nil {
-		plog.Debugf("creating lease on %v ", ls.endpoint)
+		plog.Infof("creating lease on %v ", ls.endpoint)
 		ls.createLeases()
-		plog.Debugf("done creating lease on %v ", ls.endpoint)
-		plog.Debugf("dropping lease on %v ", ls.endpoint)
+		plog.Infof("done creating lease on %v ", ls.endpoint)
+		plog.Infof("dropping lease on %v ", ls.endpoint)
 		ls.randomlyDropLeases()
-		plog.Debugf("done dropping lease on %v ", ls.endpoint)
+		plog.Infof("done dropping lease on %v ", ls.endpoint)
 	}
 }
 
