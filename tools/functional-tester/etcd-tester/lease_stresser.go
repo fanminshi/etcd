@@ -142,7 +142,7 @@ func (ls *leaseStresser) createLeases() {
 			defer wg.Done()
 			leaseID, err := ls.createLeaseAndKeepAlive()
 			if err != nil {
-				plog.Errorf("lease creation error: (%v)", err)
+				plog.Debugf("lease creation error: (%v)", err)
 				return
 			}
 			plog.Debugf("lease %v created ", leaseID)
@@ -280,7 +280,7 @@ func (ls *leaseStresser) keepLeaseAlive(leaseID int64) {
 		// lease expires after TTL become 0
 		// don't send keepalive if the lease has expired
 		if respRC.TTL <= 0 {
-			plog.Debugf("keepLeaseAlive stream receives lease %v has TTL <= 0 ", leaseID)
+			plog.Infof("keepLeaseAlive stream receives lease %v has TTL <= 0 ", leaseID)
 			return
 		}
 	}

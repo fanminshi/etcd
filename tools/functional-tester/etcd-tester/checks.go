@@ -95,7 +95,7 @@ func (lc *leaseChecker) Check() error {
 func (lc *leaseChecker) invariantCheck(lStresser Stresser) error {
 	ls := lStresser.(*leaseStresser)
 	// check revoked leases
-	plog.Debugf("revoked leases %v", ls.revokedLeases)
+	plog.Infof("revoked leases %v", ls.revokedLeases)
 	if err := leasesCheck(true, ls, ls.revokedLeases); err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (lc *leaseChecker) invariantCheck(lStresser Stresser) error {
 	ls.revokedLeases = make(map[int64]struct{})
 
 	// check alive leases
-	plog.Debugf("alive leases %v", ls.aliveLeases)
+	plog.Infof("alive leases %v", ls.aliveLeases)
 	if err := leasesCheck(false, ls, ls.aliveLeases); err != nil {
 		return err
 	}
