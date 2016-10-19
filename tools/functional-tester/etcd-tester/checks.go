@@ -41,8 +41,6 @@ const leaseCheckerTimeout = 10 * time.Second
 
 func (hc *hashChecker) Check() (err error) {
 	plog.Printf("fetching current revisions...")
-	plog.Printf("wait for 4 seconds before consistency check to ensure leases can't expire during hashes checking")
-	time.Sleep(4 * time.Second)
 	var (
 		revs   map[string]int64
 		hashes map[string]int64

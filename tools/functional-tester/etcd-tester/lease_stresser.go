@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -27,7 +28,8 @@ import (
 )
 
 // time to live for lease
-const TTL = 2
+// set TTL to 24 hrs
+const TTL = 86400
 
 type leaseStressConfig struct {
 	numLeases    int
@@ -359,10 +361,9 @@ func (ls *leaseStresser) attachKeysWithLease(leaseID int64) error {
 // randomlyDropLease drops the lease only when the rand.Int(2) returns 1.
 // This creates a 50/50 percents chance of dropping a lease
 func (ls *leaseStresser) randomlyDropLease(leaseID int64) (bool, error) {
-	// if rand.Intn(2) != 0 {
-	// 	return false, nil
-	// }
-	// always drop lease
+	if rand.Intn(2) != 0 {
+		return false, nil
+	}
 	// keep retrying until a lease is dropped or ctx is being canceled
 	for ls.ctx.Err() == nil {
 		_, err := ls.lc.LeaseRevoke(ls.ctx, &pb.LeaseRevokeRequest{ID: leaseID})
