@@ -1,5 +1,5 @@
-hash: 93d5ee1318c98aca7c4b42e057239806a565e5aadebdd79e260f95c206098358
-updated: 2016-11-11T09:49:50.684453902-08:00
+hash: 0afa8ff9032d7951eb22e49b12943dc77df83f6eb0c77f90236543358c79e2be
+updated: 2016-11-21T11:57:14.67698693-08:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
@@ -90,6 +90,8 @@ imports:
   version: 454a56f35412459b5e684fd5ec0f9211b94f002a
 - name: github.com/russross/blackfriday
   version: 300106c228d52c8941d4b3de6054a6062a86dda3
+- name: github.com/ScaleFT/monotime
+  version: 30f02635cd4fab2239c597657eb84e7f389a6371
 - name: github.com/shurcooL/sanitized_anchor_name
   version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
@@ -106,6 +108,10 @@ imports:
   - codec
 - name: github.com/urfave/cli
   version: 6011f165dc288c72abd8acd7722f837c5c64198d
+- name: github.com/winlabs/gowin32
+  version: 5ad1626a4409935a6178476042dd2083de3b30b6
+  subpackages:
+  - wrappers
 - name: github.com/xiang90/probing
   version: 07dd2e8dfe18522e9c447ba95f2fe95262f63bb2
 - name: golang.org/x/crypto
