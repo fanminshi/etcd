@@ -167,16 +167,23 @@ func makeFailures(types string, c *cluster) []failure {
 		switch fails[i] {
 		case "default":
 			defaultFailures := []failure{
-				newFailureKillAll(),
-				newFailureKillMajority(),
-				newFailureKillOne(),
-				newFailureKillLeader(),
-				newFailureKillOneForLongTime(),
-				newFailureKillLeaderForLongTime(),
-				newFailureIsolate(),
-				newFailureIsolateAll(),
-				newFailureSlowNetworkOneMember(),
-				newFailureSlowNetworkLeader(),
+				// newFailureKillAll(),
+				// newFailureKillMajority(),
+				// newFailureKillOne(),
+				// newFailureKillLeader(),
+				// newFailureKillOneForLongTime(),
+				// newFailureKillLeaderForLongTime(),
+				// newFailureIsolate(),
+				// newFailureIsolateAll(),
+				// newFailureSlowNetworkOneMember(),
+				// newFailureSlowNetworkLeader(),
+				newFailureSlowNetworkAll(),
+				newFailureSlowNetworkAll(),
+				newFailureSlowNetworkAll(),
+				newFailureSlowNetworkAll(),
+				newFailureSlowNetworkAll(),
+				newFailureSlowNetworkAll(),
+				newFailureSlowNetworkAll(),
 				newFailureSlowNetworkAll(),
 			}
 			failures = append(failures, defaultFailures...)
