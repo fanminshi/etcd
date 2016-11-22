@@ -98,18 +98,26 @@ func newFailureIsolateAll() failure {
 }
 
 func injectLatency(m *member) error {
+	plog.Printf("%v Injecting Latency", m.ClientURL)
 	if err := m.Agent.SetLatency(slowNetworkLatency, randomVariation); err != nil {
-		m.Agent.RemoveLatency()
+		plog.Printf("%v Injecting Latency error (%v)", m.ClientURL, err)
+		rErr := m.Agent.RemoveLatency()
+		plog.Printf("%v Injecting Latency's Removing Latency status %v", m.ClientURL, rErr)
 		return err
 	}
+	plog.Printf("%v Injecting Latency done", m.ClientURL)
 	return nil
 }
 
 func recoverLatency(m *member) error {
+	plog.Printf("%v recovering Latency", m.ClientURL)
 	if err := m.Agent.RemoveLatency(); err != nil {
+		plog.Printf("%v recovering Latency error (%v)", m.ClientURL, err)
 		return err
 	}
+	plog.Printf("%v recovering Latency sleep for %v", m.ClientURL, waitRecover)
 	time.Sleep(waitRecover)
+	plog.Printf("%v recovering Latency done", m.ClientURL)
 	return nil
 }
 

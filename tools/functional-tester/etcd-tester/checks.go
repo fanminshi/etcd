@@ -80,15 +80,15 @@ func (hc *hashChecker) Check() error {
 type leaseChecker struct{ ls *leaseStresser }
 
 func (lc *leaseChecker) Check() error {
-	plog.Infof("checking revoked leases %v", lc.ls.revokedLeases.leases)
+	plog.Debugf("checking revoked leases %v", lc.ls.revokedLeases.leases)
 	if err := lc.check(true, lc.ls.revokedLeases.leases); err != nil {
 		return err
 	}
-	plog.Infof("checking alive leases %v", lc.ls.aliveLeases.leases)
+	plog.Debugf("checking alive leases %v", lc.ls.aliveLeases.leases)
 	if err := lc.check(false, lc.ls.aliveLeases.leases); err != nil {
 		return err
 	}
-	plog.Infof("checking short lived leases %v", lc.ls.shortLivedLeases.leases)
+	plog.Debugf("checking short lived leases %v", lc.ls.shortLivedLeases.leases)
 	return lc.checkShortLivedLeases()
 
 }
@@ -122,14 +122,14 @@ func (lc *leaseChecker) checkShortLivedLease(ctx context.Context, leaseID int64)
 			return nil
 		}
 		if err != nil {
-			plog.Warningf("retry %d. failed to retrieve lease %v error (%v)", i, leaseID, err)
+			plog.Debugf("retry %d. failed to retrieve lease %v error (%v)", i, leaseID, err)
 			continue
 		}
 		if resp.TTL > 0 {
-			plog.Warningf("lease %v is not expired. sleep for %d until it expires.", leaseID, resp.TTL)
+			plog.Debugf("lease %v is not expired. sleep for %d until it expires.", leaseID, resp.TTL)
 			time.Sleep(time.Duration(resp.TTL) * time.Second)
 		} else {
-			plog.Warningf("retry %d. lease %v is expired but not yet revoked", i, leaseID)
+			plog.Debugf("retry %d. lease %v is expired but not yet revoked", i, leaseID)
 			time.Sleep(time.Second)
 		}
 		if err = lc.checkLease(ctx, false, leaseID); err != nil {
