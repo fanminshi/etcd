@@ -105,5 +105,5 @@ import:
   version: 976c720a22c8eb4eb6a0b4348ad85ad12491a506
   subpackages:
   - assert
-- package: github.com/ScaleFT/monotime
-  version: 30f02635cd4fab2239c597657eb84e7f389a6371
+- package: github.com/fanminshi/monotime
+  version: 7b091d147a3ec2a6abe2a02e9ffca37b819c8a93
