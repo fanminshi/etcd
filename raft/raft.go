@@ -1102,10 +1102,14 @@ func (r *raft) handleSnapshot(m pb.Message) {
 		r.logger.Infof("%x [commit: %d] restored snapshot [index: %d, term: %d]",
 			r.id, r.raftLog.committed, sindex, sterm)
 		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.lastIndex()})
+		r.logger.Infof("%x [commit: %d] restored snapshot [index: %d, term: %d] sent MsgApp",
+			r.id, r.raftLog.committed, sindex, sterm)
 	} else {
 		r.logger.Infof("%x [commit: %d] ignored snapshot [index: %d, term: %d]",
 			r.id, r.raftLog.committed, sindex, sterm)
 		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.committed})
+		r.logger.Infof("%x [commit: %d] ignored snapshot [index: %d, term: %d] sent MsgApp",
+			r.id, r.raftLog.committed, sindex, sterm)
 	}
 }
 

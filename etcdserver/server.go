@@ -765,7 +765,10 @@ func (s *EtcdServer) applyAll(ep *etcdProgress, apply *apply) {
 }
 
 func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
+	plog.Info("start applySnapshot")
+
 	if raft.IsEmptySnap(apply.snapshot) {
+		plog.Info("start applySnapshot raft.IsEmptySnap() returns true. exit")
 		return
 	}
 
@@ -863,6 +866,7 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 	ep.appliedi = apply.snapshot.Metadata.Index
 	ep.snapi = ep.appliedi
 	ep.confState = apply.snapshot.Metadata.ConfState
+	plog.Info("applySnapshot done")
 }
 
 func (s *EtcdServer) applyEntries(ep *etcdProgress, apply *apply) {
