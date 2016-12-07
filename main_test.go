@@ -1,7 +1,5 @@
 package main
 
-// need this file to generate test binary
-
 import (
 	"flag"
 	"testing"
@@ -10,12 +8,10 @@ import (
 var systemTest *bool
 
 func init() {
-	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
+	systemTest = flag.Bool("systemTest", false, "Set to true to instrument binary for code coverage")
 }
 
-// Test started when the test binary is started. Only calls main.
-func TestSystem(t *testing.T) {
-
+func TestMain(t *testing.T) {
 	if *systemTest {
 		main()
 	}

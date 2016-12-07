@@ -69,7 +69,7 @@ function unit_pass {
 	PKGS=$TEST
 	export PKGS_DELIM=$(echo $PKGS | sed 's/ /,/g')
 	# go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -run=Test -coverpkg $PKGS_DELIM {{.ImportPath}}{{end}}' $PKGS | xargs -t -I {} bash -c {}
-	go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile ${RACE} -cpu 1,2,4 -run=Test {{.ImportPath}}{{end}}' $TEST | xargs -I {} bash -c {}
+	go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile ${RACE} -cpu 1,2,4 -run=Test {{.ImportPath}}{{end}}' $TEST | xargs -t -I {} bash -c {}
 	gocovmerge *.coverprofile > cover.out
 	go tool cover -func=cover.out | tail -n1
 	rm *coverprofile
@@ -106,6 +106,16 @@ function integration_e2e_pass {
 
 function grpcproxy_pass {
 	go test -timeout 10m -v ${RACE} -tags cluster_proxy -cpu 1,2,4 $@ ${REPO_PATH}/integration
+}
+
+etcd_build_test() {
+	out="bin"
+	if [ -n "${BINDIR}" ]; then out="${BINDIR}"; fi
+	# go test -coverpkg="rrdns/..." -c -tags testrunmain rrdns
+	# Static compilation is useful when etcd is run in a container
+	PKGS=$TEST
+	export PKGS_DELIM=$(echo $PKGS | sed 's/ /,/g')
+	CGO_ENABLED=0 go test -c -covermode=count -coverpkg=$PKGS_DELIM -o ${out}/etcd_test ${REPO_PATH}/cmd/etcd || return
 }
 
 function release_pass {
@@ -263,7 +273,7 @@ function compile_pass {
 function build_pass {
 	GO_BUILD_FLAGS="-a -v" etcd_build
 }
-
+etcd_build_test
 for pass in $PASSES; do
 	${pass}_pass
 done

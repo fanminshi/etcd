@@ -1,5 +1,4 @@
 #!/bin/sh -e
-
 # set some environment variables
 ORG_PATH="github.com/coreos"
 REPO_PATH="${ORG_PATH}/etcd"
