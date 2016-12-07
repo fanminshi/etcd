@@ -65,7 +65,14 @@ fi
 function unit_pass {
 	echo "Running unit tests..."
 	# only -run=Test so examples can run in integration tests
-	go test -timeout 3m ${COVER} ${RACE} -cpu 1,2,4 -run=Test $@ ${TEST}
+	# go test -timeout 3m ${COVER} ${RACE} -cpu 1,2,4 -run=Test $@ ${TEST}
+	PKGS=$TEST
+	export PKGS_DELIM=$(echo $PKGS | sed 's/ /,/g')
+	# go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -run=Test -coverpkg $PKGS_DELIM {{.ImportPath}}{{end}}' $PKGS | xargs -t -I {} bash -c {}
+	go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile ${RACE} -cpu 1,2,4 -run=Test {{.ImportPath}}{{end}}' $TEST | xargs -I {} bash -c {}
+	gocovmerge *.coverprofile > cover.out
+	go tool cover -func=cover.out | tail -n1
+	rm *coverprofile
 }
 
 function integration_pass {
