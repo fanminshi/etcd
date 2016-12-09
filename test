@@ -57,45 +57,53 @@ fi
 split=(${TEST// / })
 TEST=${split[@]/#/${REPO_PATH}/}
 
-PKGS=$TEST
-export PKGS_DELIM=$(echo $PKGS | sed 's/ /,/g')
+# PKGS_DELIM contains all the core etcd pkgs delimited by ',' which will be profiled for code coverage.
+# Integration and e2d tests will generate code coverage for those pkgs 
+export PKGS_DELIM=$(echo $TEST | sed 's/ /,/g')
 
 # determine whether target supports race detection
 if [ "$GOARCH" == "amd64" ]; then
 	RACE="--race"
 fi
 
+export COVEROUT="coverage"
+
+# create coverage folder if it doesn't exist. if it exist, then wipe out its content for new coverage results.
+if ! [ -d "$COVEROUT" ]; then
+	mkdir "$COVEROUT"
+else
+	rm -f "$COVEROUT"/*
+fi
+
 function unit_pass {
 	echo "Running unit tests..."
-	echo "$TEST"
-	if  [ ! -d "coverage" ]; then
-		mkdir coverage
-	fi 
 	# only -run=Test so examples can run in integration tests
-	# go test -timeout 3m ${COVER} ${RACE} -cpu 1,2,4 -run=Test $@ ${TEST}
-	# go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -run=Test -coverpkg $PKGS_DELIM {{.ImportPath}}{{end}}' $PKGS | xargs -t -I {} bash -c {}
-	go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile coverage/{{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile ${RACE} -cpu 1,2,4 -run=Test {{.ImportPath}}{{end}}' $TEST | xargs -t -I {} bash -c {}
-	gocovmerge coverage/*.coverprofile > coverage/unit.out
-	go tool cover -func=coverage/unit.out | tail -n1
-	rm coverage/*.coverprofile
+	# go list (...) | xargs (...) issues following commands where each command runs a unit test for a given pkg and generates its coverage report, e.g $COVEROUT/main.coverprofile for github.com/coreos/etcd
+	# 	bash -c go test -covermode atomic -coverprofile $COVEROUT/main.coverprofile ${RACE} -cpu 1,2,4 -run=Test github.com/coreos/etcd
+	# 	ok  	github.com/coreos/etcd	0.019s	coverage: 0.0% of statements
+	#   ...
+	go list -f 'go test -covermode atomic -coverprofile $COVEROUT/{{.Name}}.coverprofile ${RACE} -cpu 1,2,4 -run=Test {{.ImportPath}}' $TEST | xargs -t -I {} bash -c {}
+	gocovmerge "$COVEROUT"/*.coverprofile > "$COVEROUT"/unit.out
+	echo "total unit test count $(go tool cover -func="$COVEROUT/unit.out" | tail -n1 | awk '{print $(NF)}')"
+	rm "$COVEROUT"/*.coverprofile
 }
 
 function integration_pass {
 	echo "Running integration tests..."
-	if  [ ! -d "coverage" ]; then
-		mkdir coverage
-	fi 
-	go test -covermode count -coverprofile coverage/integration.coverprofile -coverpkg $PKGS_DELIM -timeout 15m -v -cpu 1,2,4 $@ ${REPO_PATH}/integration
-	go test -covermode count -coverprofile coverage/client_integration.coverprofile -coverpkg $PKGS_DELIM -timeout 1m -v ${RACE} -cpu 1,2,4 $@ ${REPO_PATH}/client/integration
-	go test -covermode count -coverprofile coverage/clientv3_integration.coverprofile -coverpkg $PKGS_DELIM -timeout 10m -v ${RACE} -cpu 1,2,4 $@ ${REPO_PATH}/clientv3/integration
-	go test -covermode count -coverprofile coverage/contrib_raftexample.coverprofile -coverpkg $PKGS_DELIM -timeout 1m -v -cpu 1,2,4 $@ ${REPO_PATH}/contrib/raftexample
-	go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile coverage/{{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -coverpkg $PKGS_DELIM ${RACE} -cpu 1,2,4 -run=Example {{.ImportPath}}{{end}}' $TEST | xargs -t -I {} bash -c {}
-	gocovmerge coverage/*.coverprofile > coverage/integration.out
-	go tool cover -func=coverage/integration.out | tail -n1
+	# integration tests must use atomic covermode to ensure that coverage logic doesn't encounter data race due to multi-threaded nature of integration tests
+	go test -covermode atomic -coverprofile "$COVEROUT/integration.coverprofile" -coverpkg $PKGS_DELIM -timeout 15m -v -cpu 1,2,4 $@ ${REPO_PATH}/integration
+	go test -covermode atomic -coverprofile "$COVEROUT/client_integration.coverprofile" -coverpkg $PKGS_DELIM -timeout 1m -v ${RACE} -cpu 1 $@ ${REPO_PATH}/client/integration
+	go test -covermode atomic -coverprofile "$COVEROUT/clientv3_integration.coverprofile" -coverpkg $PKGS_DELIM -timeout 10m -v ${RACE} -cpu 1,2,4 $@ ${REPO_PATH}/clientv3/integration
+	go test -covermode atomic -coverprofile "$COVEROUT/contrib_raftexample.coverprofile" -coverpkg $PKGS_DELIM -timeout 1m -v -cpu 1,2,4 $@ ${REPO_PATH}/contrib/raftexample
+	go list -f 'go test -covermode atomic -coverprofile $COVEROUT/{{.Name}}.coverprofile ${RACE} -coverpkg $PKGS_DELIM -cpu 1,2,4 -run=Example {{.ImportPath}}' $TEST | xargs -t -I {} bash -c {}
+	gocovmerge "$COVEROUT"/*.coverprofile > "$COVEROUT"/integration.out
+	echo "total integration test coverage $(go tool cover -func="$COVEROUT/integration.out" | tail -n1 | awk '{print $(NF)}')"
+	rm "$COVEROUT"/*.coverprofile
 }
 
 function coverage_all {
-	gocovmerge coverage/*.out > all.out
+	gocovmerge "$COVEROUT"/*.out > "$COVEROUT"/all.out
+	echo "total coverage: $(go tool cover -func=$COVEROUT/all.out | tail -n1 | awk '{print $(NF)}')"
 }
 
 function e2e_pass {
@@ -292,6 +300,5 @@ for pass in $PASSES; do
 	${pass}_pass
 done
 
-coverage_all()
-
+coverage_all
 echo "Success"

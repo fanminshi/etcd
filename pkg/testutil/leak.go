@@ -105,7 +105,9 @@ func interestingGoroutines() (gs []string) {
 			continue
 		}
 		stack := strings.TrimSpace(sl[1])
+
 		if stack == "" ||
+			strings.Contains(stack, "runtime/sigqueue.go") ||
 			strings.Contains(stack, "runtime/panic.go") ||
 			strings.Contains(stack, "created by testing.RunTests") ||
 			strings.Contains(stack, "testing.Main(") ||
