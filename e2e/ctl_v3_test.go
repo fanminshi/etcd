@@ -17,6 +17,8 @@ package e2e
 import (
 	"fmt"
 	"os"
+	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -113,6 +115,10 @@ func withFlagByEnv() ctlOption {
 	return func(cx *ctlCtx) { cx.envMap = make(map[string]struct{}) }
 }
 
+func GetFunctionName(i interface{}) string {
+	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+}
+
 func testCtl(t *testing.T, testFunc func(ctlCtx), opts ...ctlOption) {
 	defer testutil.AfterTest(t)
 
@@ -132,8 +138,9 @@ func testCtl(t *testing.T, testFunc func(ctlCtx), opts ...ctlOption) {
 		ret.cfg.quotaBackendBytes = ret.quotaBackendBytes
 	}
 	ret.cfg.noStrictReconfig = ret.noStrictReconfig
-
-	epc, err := newEtcdProcessCluster(&ret.cfg)
+	testFuncName := GetFunctionName(testFunc)
+	fmt.Printf("test function name %s", testFuncName)
+	epc, err := newEtcdProcessCluster(&ret.cfg, testFuncName)
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)
 	}

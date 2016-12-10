@@ -1,18 +1,17 @@
 package main
 
 import (
-	"flag"
+	"os"
+	"os/signal"
+	"syscall"
 	"testing"
 )
 
 var systemTest *bool
 
-func init() {
-	systemTest = flag.Bool("systemTest", false, "Set to true to instrument binary for code coverage")
-}
-
-func TestMain(t *testing.T) {
-	if *systemTest {
-		main()
-	}
+func TestSystem(t *testing.T) {
+	notifier := make(chan os.Signal, 1)
+	signal.Notify(notifier, syscall.SIGINT, syscall.SIGTERM)
+	go main()
+	<-notifier
 }

@@ -175,8 +175,8 @@ type etcdProcessClusterConfig struct {
 
 // newEtcdProcessCluster launches a new cluster from etcd processes, returning
 // a new etcdProcessCluster once all nodes are ready to accept client requests.
-func newEtcdProcessCluster(cfg *etcdProcessClusterConfig) (*etcdProcessCluster, error) {
-	etcdCfgs := cfg.etcdProcessConfigs()
+func newEtcdProcessCluster(cfg *etcdProcessClusterConfig, testFuncName string) (*etcdProcessCluster, error) {
+	etcdCfgs := cfg.etcdProcessConfigs(testFuncName)
 	epc := &etcdProcessCluster{
 		cfg:   cfg,
 		procs: make([]*etcdProcess, cfg.clusterSize+cfg.proxySize),
@@ -213,8 +213,8 @@ func newEtcdProcess(cfg *etcdProcessConfig) (*etcdProcess, error) {
 	return &etcdProcess{cfg: cfg, proc: child, donec: make(chan struct{})}, nil
 }
 
-func (cfg *etcdProcessClusterConfig) etcdProcessConfigs() []*etcdProcessConfig {
-	binPath = binDir + "/etcd"
+func (cfg *etcdProcessClusterConfig) etcdProcessConfigs(testFuncName string) []*etcdProcessConfig {
+	binPath = binDir + "/etcd_test"
 	ctlBinPath = binDir + "/etcdctl"
 	certPath = certDir + "/server.crt"
 	privateKeyPath = certDir + "/server.key.insecure"
@@ -274,6 +274,7 @@ func (cfg *etcdProcessClusterConfig) etcdProcessConfigs() []*etcdProcessConfig {
 		initialCluster[i] = fmt.Sprintf("%s=%s", name, purl.String())
 
 		args := []string{
+			"-test.coverprofile", fmt.Sprintf("coverage/%s.%s.coverprofile", name, testFuncName),
 			"--name", name,
 			"--listen-client-urls", strings.Join(curls, ","),
 			"--advertise-client-urls", strings.Join(curls, ","),
