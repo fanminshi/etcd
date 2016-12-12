@@ -138,8 +138,10 @@ func testCtl(t *testing.T, testFunc func(ctlCtx), opts ...ctlOption) {
 		ret.cfg.quotaBackendBytes = ret.quotaBackendBytes
 	}
 	ret.cfg.noStrictReconfig = ret.noStrictReconfig
-	testFuncName := GetFunctionName(testFunc)
-	fmt.Printf("test function name %s", testFuncName)
+	fullTestFuncName := GetFunctionName(testFunc)
+	sa := strings.Split(fullTestFuncName, "/")
+	testFuncName := sa[len(sa)-1]
+	fmt.Printf("test function name %s \n", testFuncName)
 	epc, err := newEtcdProcessCluster(&ret.cfg, testFuncName)
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)

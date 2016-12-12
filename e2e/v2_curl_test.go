@@ -39,7 +39,7 @@ func testCurlPutGet(t *testing.T, cfg *etcdProcessClusterConfig) {
 	// stale reads that will break the test
 	cfg = configStandalone(*cfg)
 
-	epc, err := newEtcdProcessCluster(cfg)
+	epc, err := newEtcdProcessCluster(cfg, "v2_curl_test")
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)
 	}

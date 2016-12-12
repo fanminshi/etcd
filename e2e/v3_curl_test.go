@@ -30,7 +30,7 @@ func TestV3CurlPutGetClientTLS(t *testing.T) { testCurlPutGetGRPCGateway(t, &con
 func testCurlPutGetGRPCGateway(t *testing.T, cfg *etcdProcessClusterConfig) {
 	defer testutil.AfterTest(t)
 
-	epc, err := newEtcdProcessCluster(cfg)
+	epc, err := newEtcdProcessCluster(cfg, "testCurlPutGetGRPCGateway")
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)
 	}
@@ -78,7 +78,7 @@ func testCurlPutGetGRPCGateway(t *testing.T, cfg *etcdProcessClusterConfig) {
 func TestV3CurlWatch(t *testing.T) {
 	defer testutil.AfterTest(t)
 
-	epc, err := newEtcdProcessCluster(&configNoTLS)
+	epc, err := newEtcdProcessCluster(&configNoTLS, "TestV3CurlWatch")
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)
 	}

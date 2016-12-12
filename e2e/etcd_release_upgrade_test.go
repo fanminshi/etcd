@@ -40,7 +40,7 @@ func TestReleaseUpgrade(t *testing.T) {
 	copiedCfg.snapCount = 3
 	copiedCfg.baseScheme = "unix" // to avoid port conflict
 
-	epc, err := newEtcdProcessCluster(&copiedCfg)
+	epc, err := newEtcdProcessCluster(&copiedCfg, "TestReleaseUpgrade")
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)
 	}
@@ -101,7 +101,7 @@ func TestReleaseUpgradeWithRestart(t *testing.T) {
 	copiedCfg.snapCount = 10
 	copiedCfg.baseScheme = "unix"
 
-	epc, err := newEtcdProcessCluster(&copiedCfg)
+	epc, err := newEtcdProcessCluster(&copiedCfg, "TestReleaseUpgradeWithRestart")
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)
 	}

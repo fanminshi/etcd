@@ -1,16 +1,22 @@
 hash: f5e65261a5c4f6d9d4f1a7958d59d1cc94c80d8304773c0a515fb3c32e875dce
-updated: 2016-12-08T14:15:57.098159227-08:00
+updated: 2016-12-12T14:00:08.577295886-08:00
 imports:
+- name: bitbucket.org/ww/goautoneg
+  version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: github.com/beorn7/perks
-  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
+  version: b965b613227fddccbfffe13eae360ed3fa822f8d
   subpackages:
   - quantile
 - name: github.com/bgentry/speakeasy
   version: 36e9cfdd690967f4f690c6edcc9ffacd006014a0
+- name: github.com/bmatcuk/doublestar
+  version: dd6a6f0a8cdfaaa88b08cf26cf1bc7d69003ee13
 - name: github.com/boltdb/bolt
   version: 583e8937c61f1af6513608ccc75c97b6abdf4ff9
 - name: github.com/cockroachdb/cmux
   version: 112f0506e7743d64a6eb8fedbcff13d9979bbf92
+- name: github.com/codegangsta/cli
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: github.com/coreos/go-semver
   version: 568e959cd89871e61434c1143528d9162da89ef2
   subpackages:
@@ -27,7 +33,7 @@ imports:
   - capnslog
   - dlopen
 - name: github.com/cpuguy83/go-md2man
-  version: a65d4d2de4d5f7c74868dfa9b202a3c8be315aaa
+  version: 71acacd42f85e5e82f70a55327789582a5200a90
   subpackages:
   - md2man
 - name: github.com/dustin/go-humanize
@@ -63,10 +69,14 @@ imports:
   version: 2eee05ed794112d45db504eb05aa693efd2b8b09
 - name: github.com/kr/pty
   version: f7ee69f31298ecbe5d2b349c711e2547a617d398
+- name: github.com/Masterminds/semver
+  version: 434b8de7e0cb4045fe90e8e0db4667e31038175a
+- name: github.com/Masterminds/vcs
+  version: ccb44ce72b68bfe2490856b50261316c8388ac9f
 - name: github.com/mattn/go-runewidth
-  version: 737072b4e32b7a5018b4a7125da8d12de90e8045
+  version: d6bea18f789704b5f83375793155289da36a3c7f
 - name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  version: fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a
   subpackages:
   - pbutil
 - name: github.com/olekukonko/tablewriter
@@ -80,17 +90,16 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 195bde7883f7c39ea62b0d92ab7359b5327065cb
+  version: ffe929a3f4c4faeaa10f2b9535c2b1be3ad15650
   subpackages:
   - expfmt
-  - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: fcdb11ccb4389efb1b210b7ffb623ab71c5fdd60
+  version: 454a56f35412459b5e684fd5ec0f9211b94f002a
 - name: github.com/russross/blackfriday
-  version: 5f33e7b7878355cd2b7e6b8eefc48a5472c69f70
+  version: 300106c228d52c8941d4b3de6054a6062a86dda3
 - name: github.com/shurcooL/sanitized_anchor_name
-  version: 1dba4b3954bc059efc3991ec364f9f9a35f597d2
+  version: 10ef21a441db47d8b13ebcc5fd2310f636973c77
 - name: github.com/spf13/cobra
   version: 1c44ec8d3f1552cac48999f9306da23c4d8a288b
 - name: github.com/spf13/pflag
@@ -121,7 +130,7 @@ imports:
   - internal/timeseries
   - trace
 - name: golang.org/x/sys
-  version: 478fcf54317e52ab69f40bb4c7a1520288d7f7ea
+  version: 9c60d1c508f5134d1ca726b4641db998f2523357
   subpackages:
   - unix
 - name: golang.org/x/time

@@ -202,12 +202,14 @@ func newEtcdProcess(cfg *etcdProcessConfig) (*etcdProcess, error) {
 
 	if !cfg.keepDataDir {
 		if err := os.RemoveAll(cfg.dataDirPath); err != nil {
+			fmt.Printf("os.RemoveAll() error (%v)", err)
 			return nil, err
 		}
 	}
-
+	fmt.Printf("newEtcdProcess starting cmd %v \n", append([]string{cfg.execPath}, cfg.args...))
 	child, err := spawnCmd(append([]string{cfg.execPath}, cfg.args...))
 	if err != nil {
+		fmt.Printf("starting etcd process error (%v)", err)
 		return nil, err
 	}
 	return &etcdProcess{cfg: cfg, proc: child, donec: make(chan struct{})}, nil
@@ -485,6 +487,7 @@ func waitReadyExpectProc(exproc *expect.ExpectProcess, isProxy bool) error {
 		return c == len(readyStrs)
 	}
 	_, err := exproc.ExpectFunc(matchSet)
+	fmt.Printf("ExpectFunc() error (%v) \n", err)
 	return err
 }
 

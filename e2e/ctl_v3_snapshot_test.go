@@ -138,7 +138,7 @@ func TestIssue6361(t *testing.T) {
 		clusterSize:  1,
 		initialToken: "new",
 		keepDataDir:  true,
-	})
+	}, "TestIssue6361")
 	if err != nil {
 		t.Fatalf("could not start etcd process cluster (%v)", err)
 	}
