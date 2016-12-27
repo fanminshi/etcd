@@ -90,12 +90,17 @@ function unit_pass {
 
 function integration_pass {
 	echo "Running integration tests..."
-	# integration tests must use atomic covermode to ensure that coverage logic doesn't encounter data race due to multi-threaded nature of integration tests
+	# integration tests must use atomic covermode to ensure additional coverage logic inserted to the source code by go test does not induce data race from the multi-threaded nature of integration tests
 	go test -covermode atomic -coverprofile "$COVEROUT/integration.coverprofile" -coverpkg $PKGS_DELIM -timeout 15m -v -cpu 1,2,4 $@ ${REPO_PATH}/integration
 	go test -covermode atomic -coverprofile "$COVEROUT/client_integration.coverprofile" -coverpkg $PKGS_DELIM -timeout 1m -v ${RACE} -cpu 1 $@ ${REPO_PATH}/client/integration
 	go test -covermode atomic -coverprofile "$COVEROUT/clientv3_integration.coverprofile" -coverpkg $PKGS_DELIM -timeout 10m -v ${RACE} -cpu 1,2,4 $@ ${REPO_PATH}/clientv3/integration
 	go test -covermode atomic -coverprofile "$COVEROUT/contrib_raftexample.coverprofile" -coverpkg $PKGS_DELIM -timeout 1m -v -cpu 1,2,4 $@ ${REPO_PATH}/contrib/raftexample
 	go list -f 'go test -covermode atomic -coverprofile $COVEROUT/{{.Name}}.coverprofile ${RACE} -coverpkg $PKGS_DELIM -cpu 1,2,4 -run=Example {{.ImportPath}}' $TEST | xargs -t -I {} bash -c {}
+		# only -run=Test so examples can run in integration tests
+	# go list (...) | xargs (...) issues following commands where each command runs a unit test for a given pkg and generates its coverage report, e.g $COVEROUT/main.coverprofile for github.com/coreos/etcd
+	# 	bash -c go test -covermode atomic -coverprofile $COVEROUT/main.coverprofile ${RACE} -cpu 1,2,4 -run=Test github.com/coreos/etcd
+	# 	ok  	github.com/coreos/etcd	0.019s	coverage: 0.0% of statements
+	#   ...
 	gocovmerge "$COVEROUT"/*.coverprofile > "$COVEROUT"/integration.out
 	echo "total integration test coverage $(go tool cover -func="$COVEROUT/integration.out" | tail -n1 | awk '{print $(NF)}')"
 	rm "$COVEROUT"/*.coverprofile
